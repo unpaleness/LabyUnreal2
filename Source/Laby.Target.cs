@@ -3,12 +3,12 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class LabyUnreal2Target : TargetRules
+public class LabyTarget : TargetRules
 {
-	public LabyUnreal2Target(TargetInfo Target) : base(Target)
+	public LabyTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
 
-		ExtraModuleNames.AddRange( new string[] { "LabyUnreal2" } );
+		ExtraModuleNames.AddRange( new string[] { "Laby" } );
 	}
 }

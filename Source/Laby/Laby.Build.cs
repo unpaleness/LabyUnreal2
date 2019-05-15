@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class LabyUnreal2 : ModuleRules
+public class Laby : ModuleRules
 {
-	public LabyUnreal2(ReadOnlyTargetRules Target) : base(Target)
+	public Laby(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 

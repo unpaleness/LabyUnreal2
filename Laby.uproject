@@ -5,7 +5,7 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "LabyUnreal2",
+			"Name": "Laby",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

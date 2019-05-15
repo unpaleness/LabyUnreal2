@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "LabyUnreal2GameModeBase.generated.h"
+#include "LabyGameModeBase.generated.h"
 
 /**
  *
  */
 UCLASS()
-class LABYUNREAL2_API ALabyUnreal2GameModeBase : public AGameModeBase
+class LABY_API ALabyGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
