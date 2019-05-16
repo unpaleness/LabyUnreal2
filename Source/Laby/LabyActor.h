@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
+#include "Generator/Generators.h"
+#include "Typedefs.h"
 #include "LabyActor.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogLabyActor, Log, All)
@@ -30,21 +32,7 @@ protected:
 	void AddTriangle(int32 V1, int32 V2, int32 V3);
 	void AddPlane(FVector P1, FVector P2);
 	void AddCuboid(FVector P1, FVector P2, EMazeCubiodFaces Direction);
-	/** Generates maze using Recursive Backtracking algorithm */
 	void GenerateMaze();
-	/**
-	 * Gets index of not visited neighbour cell
-	 * @param Index                Index of current cell
-	 * @param Cells                Array of cells, where "true" - visited, "false" - unvisited
-	 * @return Index of not visited neighbour cell or -1 if where is no such cell
-	 */
-	int32 GetRandomNeighbour(int32 Index, bool* Cells);
-	/**
-	 * Tries to break a wall between two cells
-	 * @param C1                   Index of first cell
-	 * @param C2                   Index of second cell
-	 */
-	void BreakWall(int32 C1, int32 C2);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
@@ -81,9 +69,11 @@ protected:
 	/** Inner Height */
 	float H;
 	/** Horizontal array of walls (has size (VCells + 1) * HCells) */
-	TArray<bool> HWalls;
+	Walls HWalls;
 	/** Vertical array of walls (has size VCells * (HCells + 1)) */
-	TArray<bool> VWalls;
+	Walls VWalls;
 	/** Whether walls need to generate */
 	bool IsMazeNeedGenerate = true;
+	/** A pointer to maze generator */
+	GeneratorBase* Generator;
 };
