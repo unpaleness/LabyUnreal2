@@ -14,6 +14,12 @@ enum class EMazeCubiodFaces : uint8 {
 	Horizontal
 };
 
+UENUM()
+enum class EMazeGenerators : uint8 {
+	OnlyWalls            UMETA(DisplayName = "OnlyWalls"),
+	RecursiveBacktracker UMETA(DisplayName = "RecursiveBacktracker")
+};
+
 UCLASS()
 class LABY_API ALabyActor : public AActor {
 	GENERATED_BODY()
@@ -36,30 +42,34 @@ protected:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
-		UProceduralMeshComponent* Mesh;
+	UProceduralMeshComponent* Mesh;
 	/** Number of cells in horizontal direction */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ProceduralMesh|Maze", meta = (ClampMin = "1", ClampMax = "256", UIMin = "1", UIMax = "256"))
-		int32 HCells = 1;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "1", ClampMax = "256", UIMin = "1", UIMax = "256"))
+	int32 HCells = 1;
 	/** Number of cells in vertical direction */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ProceduralMesh|Maze", meta = (ClampMin = "1", ClampMax = "256", UIMin = "1", UIMax = "256"))
-		int32 VCells = 1;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "1", ClampMax = "256", UIMin = "1", UIMax = "256"))
+	int32 VCells = 1;
 	/** Size of one cell */
-	UPROPERTY(BlueprintReadonly, EditAnywhere, Category = "ProceduralMesh|Settings")
-		float Size = 100.0f;
+	UPROPERTY(BlueprintReadonly, EditAnywhere, Category = "Maze")
+	float CellSize = 100.0f;
 	/** Width of labyrinth wall in relative units comparing with cell's size*/
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ProceduralMesh|Maze", meta = (ClampMin = "0"))
-		float WallWidthRelative = 0.05f;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "0"))
+	float WallWidthRelative = 0.05f;
 	/** Wall height */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ProceduralMesh|Maze", meta = (ClampMin = "0"))
-		float Height = 50.0f;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "0"))
+	float Height = 50.0f;
+	/** Maze generator algorithm */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze")
+	EMazeGenerators Algorithm = EMazeGenerators::OnlyWalls;
 	/** Interation limit for generator */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ProceduralMesh|Maze", meta = (ClampMin = "0"))
-		int32 MaxIterations = 100000;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "0"))
+	int32 MaxIterations = 100000;
 
-	float InnerSize = 0.0f;
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
 	TArray<FVector2D> UVs;
+	/** Inner cell size */
+	float S = 0.0f;
 	/** Inner number of cells in horizontal direction */
 	int32 X;
 	/** Inner number of cells in vercital direction */
@@ -75,5 +85,7 @@ protected:
 	/** Whether walls need to generate */
 	bool IsMazeNeedGenerate = true;
 	/** A pointer to maze generator */
-	GeneratorBase* Generator;
+	GeneratorBase* Generator = nullptr;
+	/** Inner algorithm */
+	EMazeGenerators Alg;
 };

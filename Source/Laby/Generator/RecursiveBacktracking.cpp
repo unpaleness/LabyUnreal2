@@ -6,7 +6,7 @@ void RecursiveBacktracking::GenerateMaze() {
 	HWalls->Empty();
 	VWalls->Empty();
 
-	// Init all walls with
+	// Fill all walls
 	HWalls->Init(true, (Y + 1) * X);
 	VWalls->Init(true, Y * (X + 1));
 
@@ -29,13 +29,13 @@ void RecursiveBacktracking::GenerateMaze() {
 	int32 it{ 0 };
 	while (N > 0) {
 		if (++it > MaxIterations) {
-			UE_LOG(LogLabyGenerator, Warning, TEXT("Limit of %i iteration exceeded!"), MaxIterations);
+			UE_LOG(LogLabyGenerator, Warning, TEXT("Limit of %i iteration exceeded!"), MaxIterations)
 			break;
 		}
-		//UE_LOG(LogLabyGenerator, Display, TEXT("N: %i, Processing (%i, %i)"), N, Path[N - 1] % X, Path[N - 1] / X);
+		//UE_LOG(LogLabyGenerator, Display, TEXT("N: %i, Processing (%i, %i)"), N, Path[N - 1] % X, Path[N - 1] / X)
 		int32 NextCell{ GetRandomNeighbour(Path[N - 1], Cells) };
 		if (NextCell >= X * Y) {
-			UE_LOG(LogLabyGenerator, Warning, TEXT("Next cell index (%i) is above maximum possible (%i)!"), NextCell, X * Y - 1);
+			UE_LOG(LogLabyGenerator, Warning, TEXT("Next cell index (%i) is above maximum possible (%i)!"), NextCell, X * Y - 1)
 			break;
 		}
 		if (NextCell >= 0) {
@@ -89,7 +89,7 @@ int32 RecursiveBacktracking::GetRandomNeighbour(int32 Index, bool* Cells) {
 		AvailDirs[3] = true;
 		++Dirs;
 	}
-	//UE_LOG(LogLabyGenerator, Display, TEXT("Neighbours %i: %i, %i, %i, %i"), Dirs, AvailDirs[0], AvailDirs[1], AvailDirs[2], AvailDirs[3]);
+	//UE_LOG(LogLabyGenerator, Display, TEXT("Neighbours %i: %i, %i, %i, %i"), Dirs, AvailDirs[0], AvailDirs[1], AvailDirs[2], AvailDirs[3])
 	// No neighbours
 	if (Dirs <= 0) {
 		return -1;
@@ -101,16 +101,16 @@ int32 RecursiveBacktracking::GetRandomNeighbour(int32 Index, bool* Cells) {
 		if (ValidDir == Dir) {
 			switch (i) {
 			case 0:
-				//UE_LOG(LogLabyGenerator, Display, TEXT("Southern dir (%i, %i)"), (Index - X) % X, (Index - X) / X);
+				//UE_LOG(LogLabyGenerator, Display, TEXT("Southern dir (%i, %i)"), (Index - X) % X, (Index - X) / X)
 				return Index - X;
 			case 1:
-				//UE_LOG(LogLabyGenerator, Display, TEXT("Northern dir (%i, %i)"), (Index + X) % X, (Index + X) / X);
+				//UE_LOG(LogLabyGenerator, Display, TEXT("Northern dir (%i, %i)"), (Index + X) % X, (Index + X) / X)
 				return Index + X;
 			case 2:
-				//UE_LOG(LogLabyGenerator, Display, TEXT("Eastern dir (%i, %i)"), (Index - 1) % X, (Index - 1) / X);
+				//UE_LOG(LogLabyGenerator, Display, TEXT("Eastern dir (%i, %i)"), (Index - 1) % X, (Index - 1) / X)
 				return Index - 1;
 			case 3:
-				//UE_LOG(LogLabyGenerator, Display, TEXT("Western dir (%i, %i)"), (Index + 1) % X, (Index + 1) / X);
+				//UE_LOG(LogLabyGenerator, Display, TEXT("Western dir (%i, %i)"), (Index + 1) % X, (Index + 1) / X)
 				return Index + 1;
 			}
 			break;
@@ -120,7 +120,7 @@ int32 RecursiveBacktracking::GetRandomNeighbour(int32 Index, bool* Cells) {
 }
 
 void RecursiveBacktracking::BreakWall(int32 C1, int32 C2) {
-	//UE_LOG(LogLabyGenerator, Display, TEXT("Breaking wall (%i,%i)|(%i,%i)"), C1 % X, C1 / X, C2 % X, C2 / X);
+	//UE_LOG(LogLabyGenerator, Display, TEXT("Breaking wall (%i,%i)|(%i,%i)"), C1 % X, C1 / X, C2 % X, C2 / X)
 	if (C1 < 0 || C2 < 0 || C1 >= X * Y || C2 >= X * Y) {
 		return;
 	}
@@ -132,5 +132,5 @@ void RecursiveBacktracking::BreakWall(int32 C1, int32 C2) {
 		(*HWalls)[(C1 > C2 ? C1 : C2)] = false;
 		return;
 	}
-	UE_LOG(LogLabyGenerator, Warning, TEXT("Breaking wall (%i,%i)|(%i,%i) failed!"), C1 % X, C1 / X, C2 % X, C2 / X);
+	UE_LOG(LogLabyGenerator, Warning, TEXT("Breaking wall (%i,%i)|(%i,%i) failed!"), C1 % X, C1 / X, C2 % X, C2 / X)
 }

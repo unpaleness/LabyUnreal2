@@ -30,7 +30,7 @@ void ALabyActor::BeginPlay() {
 }
 
 void ALabyActor::GenerateMesh() {
-	InnerSize = Size;
+	S = CellSize;
 
 	InitArrays();
 
@@ -46,10 +46,10 @@ void ALabyActor::AddTriangle(int32 V1, int32 V2, int32 V3) {
 
 bool ALabyActor::HasChanges() {
 	bool result{ false };
-	if (Size != InnerSize) {
+	if (CellSize != S) {
 		result = true;
 	}
-	if (HCells != X || VCells != Y) {
+	if (HCells != X || VCells != Y || Algorithm != Alg) {
 		IsMazeNeedGenerate = true;
 		result = true;
 	}
@@ -73,13 +73,13 @@ void ALabyActor::InitArrays() {
 	// Add floor
 	AddPlane(
 		FVector(
-			-Size * (W * (X + 1) + X) / 2.0f,
-			-Size * (W * (Y + 1) + Y) / 2.0f,
+			-S * (W * (X + 1) + X) / 2.0f,
+			-S * (W * (Y + 1) + Y) / 2.0f,
 			0.0f
 		),
 		FVector(
-			Size * (W * (X + 1) + X) / 2.0f,
-			Size * (W * (Y + 1) + Y) / 2.0f,
+			S * (W * (X + 1) + X) / 2.0f,
+			S * (W * (Y + 1) + Y) / 2.0f,
 			0.0f
 		)
 	);
@@ -91,13 +91,13 @@ void ALabyActor::InitArrays() {
 				if (VWalls[j * (X + 1) + i]) {
 					AddCuboid(
 						FVector(
-							Size * ((W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
-							Size * (W + (W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
+							S * ((W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
+							S * (W + (W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
 							0.0f
 						),
 						FVector(
-							Size * (W + (W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
-							Size * ((W + 1.0f) * (j + 1) - ((W + 1.0f) * Y + W) / 2.0f),
+							S * (W + (W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
+							S * ((W + 1.0f) * (j + 1) - ((W + 1.0f) * Y + W) / 2.0f),
 							H
 						), EMazeCubiodFaces::Horizontal
 					);
@@ -108,13 +108,13 @@ void ALabyActor::InitArrays() {
 				if (HWalls[j * X + i]) {
 					AddCuboid(
 						FVector(
-							Size * (W + (W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
-							Size * ((W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
+							S * (W + (W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
+							S * ((W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
 							0.0f
 						),
 						FVector(
-							Size * ((W + 1.0f) * (i + 1) - ((W + 1.0f) * X + W) / 2.0f),
-							Size * (W + (W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
+							S * ((W + 1.0f) * (i + 1) - ((W + 1.0f) * X + W) / 2.0f),
+							S * (W + (W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
 							H
 						), EMazeCubiodFaces::Vertical
 					);
@@ -123,13 +123,13 @@ void ALabyActor::InitArrays() {
 			// Corner
 			AddCuboid(
 				FVector(
-					Size * ((W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
-					Size * ((W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
+					S * ((W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
+					S * ((W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
 					0.0f
 				),
 				FVector(
-					Size * (W + (W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
-					Size * (W + (W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
+					S * (W + (W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
+					S * (W + (W + 1.0f) * j - ((W + 1.0f) * Y + W) / 2.0f),
 					1.1f * H
 				), EMazeCubiodFaces::All
 			);
@@ -223,11 +223,22 @@ void ALabyActor::AddCuboid(FVector P1, FVector P2, EMazeCubiodFaces Direction) {
 void ALabyActor::GenerateMaze() {
 	X = HCells;
 	Y = VCells;
+	Alg = Algorithm;
 
-	Generator = new RecursiveBacktracking;
-	Generator->Init(X, Y, &HWalls, &VWalls, MaxIterations);
-	Generator->GenerateMaze();
-	delete Generator;
+	switch (Alg) {
+		case EMazeGenerators::OnlyWalls:
+			Generator = new OnlyWalls;
+			break;
+		case EMazeGenerators::RecursiveBacktracker:
+			Generator = new RecursiveBacktracking;
+			break;
+	}
+	if (Generator != nullptr) {
+		Generator->Init(X, Y, &HWalls, &VWalls, MaxIterations);
+		Generator->GenerateMaze();
+		delete Generator;
+		Generator = nullptr;
+	}
 
 	IsMazeNeedGenerate = false;
 }
