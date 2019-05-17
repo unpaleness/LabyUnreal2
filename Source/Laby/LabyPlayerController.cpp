@@ -28,12 +28,18 @@ void ALabyPlayerController::MoveForward(float AxisValue) {
 }
 
 void ALabyPlayerController::MoveRight(float AxisValue) {
+	FVector Right = GetControlRotation().Quaternion().GetRightVector();
+	FVector NoZ(Right.X, Right.Y, 0.0f);
+	NoZ.Normalize();
+	GetPawn()->AddMovementInput(NoZ, AxisValue * FinalMovementSpeed);
 }
 
 void ALabyPlayerController::LookRight(float AxisValue) {
+	AddYawInput(AxisValue * LookSpeed);
 }
 
 void ALabyPlayerController::LookDown(float AxisValue) {
+	AddPitchInput(-AxisValue * LookSpeed);
 }
 
 void ALabyPlayerController::Acceleration(float AxisValue) {
