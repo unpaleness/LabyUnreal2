@@ -10,8 +10,9 @@
  *
  */
 UCLASS()
-class LABY_API ALabyGameModeBase : public AGameModeBase
-{
+class LABY_API ALabyGameModeBase : public AGameModeBase {
 	GENERATED_BODY()
 
+public:
+	ALabyGameModeBase();
 };
