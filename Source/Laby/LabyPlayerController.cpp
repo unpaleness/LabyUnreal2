@@ -10,6 +10,14 @@ ALabyPlayerController::ALabyPlayerController() {
 	AutoReceiveInput = EAutoReceiveInput::Player0;
 }
 
+void ALabyPlayerController::PlayerTick(float DeltaTime) {
+	Super::PlayerTick(DeltaTime);
+
+	FVector MovementDirection(ForwardDirection + RightDirection);
+	MovementDirection.Normalize();
+	GetPawn()->AddMovementInput(MovementDirection, DeltaTime * FinalMovementSpeed);
+}
+
 void ALabyPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
 
@@ -22,16 +30,16 @@ void ALabyPlayerController::SetupInputComponent() {
 
 void ALabyPlayerController::MoveForward(float AxisValue) {
 	FVector Forward = GetControlRotation().Vector();
-	FVector NoZ(Forward.X, Forward.Y, 0.0f);
-	NoZ.Normalize();
-	GetPawn()->AddMovementInput(NoZ, AxisValue * FinalMovementSpeed);
+	ForwardDirection = FVector(Forward.X, Forward.Y, 0.0f);
+	ForwardDirection.Normalize();
+	ForwardDirection *= AxisValue;
 }
 
 void ALabyPlayerController::MoveRight(float AxisValue) {
 	FVector Right = GetControlRotation().Quaternion().GetRightVector();
-	FVector NoZ(Right.X, Right.Y, 0.0f);
-	NoZ.Normalize();
-	GetPawn()->AddMovementInput(NoZ, AxisValue * FinalMovementSpeed);
+	RightDirection = FVector(Right.X, Right.Y, 0.0f);
+	RightDirection.Normalize();
+	RightDirection *= AxisValue;
 }
 
 void ALabyPlayerController::LookRight(float AxisValue) {
