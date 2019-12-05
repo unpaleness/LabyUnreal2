@@ -3,13 +3,12 @@
 DEFINE_LOG_CATEGORY(LogLabyGenerator)
 
 GeneratorBase::GeneratorBase() {}
+GeneratorBase::~GeneratorBase() {};
 
-void GeneratorBase::Init(int32 NewX, int32 NewY, Walls* NewHWalls, Walls* NewVWalls, int32 NewMaxIterations) {
-	X = NewX;
-	Y = NewY;
-	HWalls = NewHWalls;
-	VWalls = NewVWalls;
+void GeneratorBase::Init(int32 NewMaxIterations) {
 	MaxIterations = NewMaxIterations;
 }
 
-void GeneratorBase::GenerateMaze() {}
+LabyContainerPtr GeneratorBase::GenerateMaze(int32 HSize, int32 VSize) {
+	return std::make_shared<LabyContainer>(HSize, VSize);
+}

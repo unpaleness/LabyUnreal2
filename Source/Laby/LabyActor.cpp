@@ -88,7 +88,7 @@ void ALabyActor::InitArrays() {
 		for (int32 i = 0; i < X + 1; ++i) {
 			// Vertical walls
 			if (j < Y) {
-				if (VWalls[j * (X + 1) + i]) {
+				if (Maze->VWalls->at(j * (X + 1) + i)) {
 					AddCuboid(
 						FVector(
 							S * ((W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
@@ -105,7 +105,7 @@ void ALabyActor::InitArrays() {
 			}
 			// Horizontal walls
 			if (i < X) {
-				if (HWalls[j * X + i]) {
+				if (Maze->HWalls->at(j * X + i)) {
 					AddCuboid(
 						FVector(
 							S * (W + (W + 1.0f) * i - ((W + 1.0f) * X + W) / 2.0f),
@@ -225,6 +225,7 @@ void ALabyActor::GenerateMaze() {
 	Y = VCells;
 	Alg = Algorithm;
 
+	GeneratorBase* Generator = nullptr;
 	switch (Alg) {
 		case EMazeGenerators::OnlyWalls:
 			Generator = new OnlyWalls;
@@ -232,10 +233,13 @@ void ALabyActor::GenerateMaze() {
 		case EMazeGenerators::RecursiveBacktracker:
 			Generator = new RecursiveBacktracking;
 			break;
+		default:
+			UE_LOG(LogLabyActor, Error, TEXT("Invalid EMazeGenerators value: %i, cannot create Generator"), Alg)
+			break;
 	}
 	if (Generator != nullptr) {
-		Generator->Init(X, Y, &HWalls, &VWalls, MaxIterations);
-		Generator->GenerateMaze();
+		Generator->Init(MaxIterations);
+		Maze = Generator->GenerateMaze(X, Y);
 		delete Generator;
 		Generator = nullptr;
 	}

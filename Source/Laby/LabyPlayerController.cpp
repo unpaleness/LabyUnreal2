@@ -2,6 +2,8 @@
 
 #include "LabyPlayerController.h"
 
+#include <GameFramework/Pawn.h>
+
 
 DEFINE_LOG_CATEGORY(LogLabyPlayerController)
 
@@ -15,7 +17,13 @@ void ALabyPlayerController::PlayerTick(float DeltaTime) {
 
 	FVector MovementDirection(ForwardDirection + RightDirection);
 	MovementDirection.Normalize();
-	GetPawn()->AddMovementInput(MovementDirection, DeltaTime * FinalMovementSpeed);
+
+	auto ControlledPawn = GetPawn();
+	if (IsValid(ControlledPawn)) {
+		ControlledPawn->AddMovementInput(MovementDirection, DeltaTime * FinalMovementSpeed);
+	} else {
+		UE_LOG(LogLabyPlayerController, Warning, TEXT("ControlledPawn is invalid!"));
+	}
 }
 
 void ALabyPlayerController::SetupInputComponent() {

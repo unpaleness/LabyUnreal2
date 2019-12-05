@@ -6,6 +6,6 @@ class OnlyWalls : public GeneratorBase {
 public:
 	OnlyWalls();
 
-	/** Fills all walls */
-	virtual void GenerateMaze() override;
+	/** Only creates all possible walls */
+	virtual LabyContainerPtr GenerateMaze(int32 HSize, int32 VSize) override;
 };

@@ -2,11 +2,6 @@
 
 OnlyWalls::OnlyWalls() {}
 
-void OnlyWalls::GenerateMaze() {
-	HWalls->Empty();
-	VWalls->Empty();
-
-	// Fill all walls
-	HWalls->Init(true, (Y + 1) * X);
-	VWalls->Init(true, Y * (X + 1));
+LabyContainerPtr OnlyWalls::GenerateMaze(int32 HSize, int32 VSize) {
+	return GeneratorBase::GenerateMaze(HSize, VSize);
 }

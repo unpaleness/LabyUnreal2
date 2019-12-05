@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
 #include "Generator/Generators.h"
-#include "Typedefs.h"
+#include "LabyContainer.h"
 #include "LabyActor.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogLabyActor, Log, All)
@@ -32,6 +32,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+private:
 	void GenerateMesh();
 	bool HasChanges();
 	void InitArrays();
@@ -65,6 +66,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "0"))
 	int32 MaxIterations = 100000;
 
+private:
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
 	TArray<FVector2D> UVs;
@@ -72,20 +74,16 @@ protected:
 	float S = 0.0f;
 	/** Inner number of cells in horizontal direction */
 	int32 X;
-	/** Inner number of cells in vercital direction */
+	/** Inner number of cells in vertical direction */
 	int32 Y;
 	/** Inner WallWidthRelative */
 	float W;
 	/** Inner Height */
 	float H;
-	/** Horizontal array of walls (has size (VCells + 1) * HCells) */
-	Walls HWalls;
-	/** Vertical array of walls (has size VCells * (HCells + 1)) */
-	Walls VWalls;
+	/** A pointer to struct with walls */
+	LabyContainerPtr Maze;
 	/** Whether walls need to generate */
 	bool IsMazeNeedGenerate = true;
-	/** A pointer to maze generator */
-	GeneratorBase* Generator = nullptr;
 	/** Inner algorithm */
 	EMazeGenerators Alg;
 };

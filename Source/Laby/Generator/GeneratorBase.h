@@ -1,22 +1,19 @@
 #pragma once
 
 #include "Logging/LogMacros.h"
-#include "Typedefs.h"
+#include "LabyContainer.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogLabyGenerator, Log, All)
 
 class GeneratorBase {
 public:
 	GeneratorBase();
+	virtual ~GeneratorBase();
 
-	void Init(int32 NewX, int32 NewY, Walls* NewHWalls, Walls* NewVWalls, int32 NewMaxIterations);
+	void Init(int32 NewMaxIterations);
 	/** Generates maze */
-	virtual void GenerateMaze();
+	virtual LabyContainerPtr GenerateMaze(int32 HSize, int32 VSize);
 
 protected:
-	int32 X = 1;
-	int32 Y = 1;
-	Walls* HWalls;
-	Walls* VWalls;
 	int32 MaxIterations = 10000;
 };
