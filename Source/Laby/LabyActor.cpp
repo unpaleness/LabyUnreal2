@@ -1,5 +1,7 @@
 #include "LabyActor.h"
 
+#include "Generator/Factory.h"
+
 DEFINE_LOG_CATEGORY(LogLabyActor)
 
 ALabyActor::ALabyActor() {
@@ -225,24 +227,13 @@ void ALabyActor::GenerateMaze() {
 	Y = VCells;
 	Alg = Algorithm;
 
-	GeneratorBase* Generator = nullptr;
-	switch (Alg) {
-		case EMazeGenerators::OnlyWalls:
-			Generator = new OnlyWalls;
-			break;
-		case EMazeGenerators::RecursiveBacktracker:
-			Generator = new RecursiveBacktracking;
-			break;
-		default:
-			UE_LOG(LogLabyActor, Error, TEXT("Invalid EMazeGenerators value: %i, cannot create Generator"), Alg)
-			break;
-	}
-	if (Generator != nullptr) {
+	auto Generator = Generator::Create(Alg);
+
+	if (Generator) {
 		Generator->Init(MaxIterations);
 		Maze = Generator->GenerateMaze(X, Y);
-		delete Generator;
-		Generator = nullptr;
+		IsMazeNeedGenerate = false;
+	} else {
+		UE_LOG(LogLabyActor, Error, TEXT("Invalid Generator::Type value: %i, cannot create maze generator"), static_cast<int32>(Alg))
 	}
-
-	IsMazeNeedGenerate = false;
 }

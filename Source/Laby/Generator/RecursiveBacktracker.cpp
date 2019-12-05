@@ -1,4 +1,6 @@
-#include "RecursiveBacktracking.h"
+#include "RecursiveBacktracker.h"
+
+namespace Generator {
 
 namespace {
 
@@ -90,10 +92,10 @@ void BreakWall(int32 C1, int32 C2, LabyContainerPtr Maze) {
 
 }  // namespace
 
-RecursiveBacktracking::RecursiveBacktracking() {}
+RecursiveBacktracker::RecursiveBacktracker() {}
 
-LabyContainerPtr RecursiveBacktracking::GenerateMaze(int32 NewHSize, int32 NewVSize) {
-	auto Maze = GeneratorBase::GenerateMaze(NewHSize, NewVSize);
+LabyContainerPtr RecursiveBacktracker::GenerateMaze(int32 NewHSize, int32 NewVSize) {
+	auto Maze = Base::GenerateMaze(NewHSize, NewVSize);
 
 	if (!Maze || !(*Maze)) {
 		UE_LOG(LogLabyGenerator, Error, TEXT("Maze is uninitialized!"))
@@ -141,3 +143,5 @@ LabyContainerPtr RecursiveBacktracking::GenerateMaze(int32 NewHSize, int32 NewVS
 
 	return Maze;
 }
+
+}  // namespace Generator

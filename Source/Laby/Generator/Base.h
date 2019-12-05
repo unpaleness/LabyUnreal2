@@ -5,10 +5,12 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogLabyGenerator, Log, All)
 
-class GeneratorBase {
+namespace Generator {
+
+class Base {
 public:
-	GeneratorBase();
-	virtual ~GeneratorBase();
+	Base();
+	virtual ~Base();
 
 	void Init(int32 NewMaxIterations);
 	/** Generates maze */
@@ -17,3 +19,5 @@ public:
 protected:
 	int32 MaxIterations = 10000;
 };
+
+}  // namespace Generator

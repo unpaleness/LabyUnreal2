@@ -1,11 +1,15 @@
 #pragma once
 
-#include "GeneratorBase.h"
+#include "Base.h"
 
-class RecursiveBacktracking : public GeneratorBase {
+namespace Generator {
+
+class RecursiveBacktracker : public Base {
 public:
-	RecursiveBacktracking();
+	RecursiveBacktracker();
 
 	/** Generates maze using Recursive Backtracking algorithm */
 	virtual LabyContainerPtr GenerateMaze(int32 NewHSize, int32 NewVSize) override;
 };
+
+}  // namespace Generator

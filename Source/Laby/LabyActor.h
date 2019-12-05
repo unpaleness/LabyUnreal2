@@ -2,8 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
-#include "Generator/Generators.h"
 #include "LabyContainer.h"
+#include "Generator/Types.h"
 #include "LabyActor.generated.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogLabyActor, Log, All)
@@ -12,12 +12,6 @@ enum class EMazeCubiodFaces : uint8 {
 	All,
 	Vertical,
 	Horizontal
-};
-
-UENUM()
-enum class EMazeGenerators : uint8 {
-	OnlyWalls            UMETA(DisplayName = "OnlyWalls"),
-	RecursiveBacktracker UMETA(DisplayName = "RecursiveBacktracker")
 };
 
 UCLASS()
@@ -61,7 +55,7 @@ protected:
 	float Height = 50.0f;
 	/** Maze generator algorithm */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze")
-	EMazeGenerators Algorithm = EMazeGenerators::OnlyWalls;
+	EGeneratorType Algorithm = EGeneratorType::OnlyWalls;
 	/** Interation limit for generator */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "0"))
 	int32 MaxIterations = 100000;
@@ -85,5 +79,5 @@ private:
 	/** Whether walls need to generate */
 	bool IsMazeNeedGenerate = true;
 	/** Inner algorithm */
-	EMazeGenerators Alg;
+	EGeneratorType Alg;
 };
