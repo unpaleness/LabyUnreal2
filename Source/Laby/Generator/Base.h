@@ -17,7 +17,7 @@ public:
 	virtual LabyContainerPtr GenerateMaze(int32 HSize, int32 VSize);
 
 protected:
-	int32 MaxIterations = 10000;
+	int32 MaxIterations{ 10000 };
 };
 
 }  // namespace Generator
