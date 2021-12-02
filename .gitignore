@@ -1,4 +1,5 @@
 *.sln
+.idea
 .vs/
 Binaries
 Build

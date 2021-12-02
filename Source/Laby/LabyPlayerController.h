@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,9 +6,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogLabyPlayerController, Log, All)
 
-/**
- *
- */
+
 UCLASS()
 class LABY_API ALabyPlayerController : public APlayerController {
 	GENERATED_BODY()
@@ -32,12 +28,15 @@ protected:
 	/** Movement speed without acceleration */
 	UPROPERTY(EditAnywhere, Category = "Player")
 	float MovementSpeed = 30.0f;
+
 	/** Lookaround speed */
 	UPROPERTY(EditAnywhere, Category = "Player")
 	float LookSpeed = 0.75f;
+
 	/** Relative speed when acceleration button is pressed */
 	UPROPERTY(EditAnywhere, Category = "Player")
 	float AccelerationMultiplier = 2.0f;
+
 	/** Total movement speed including potential acceletation */
 	UPROPERTY(EditAnywhere, Category = "Player")
 	float FinalMovementSpeed = 0.0f;
@@ -47,5 +46,10 @@ protected:
 
 	/** Unit or null vector which indicates whether player is moving right/left or not */
 	FVector RightDirection = FVector(0.0f);
-	
+
+	/** Input for rotating horizontally */
+	float YawInput = 0.0f;
+
+	/** Input for camera rotating up/down */
+	float PitchInput = 0.0f;
 };

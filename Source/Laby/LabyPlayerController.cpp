@@ -1,8 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "LabyPlayerController.h"
 
-#include <GameFramework/Pawn.h>
+#include "LabyPawn.h"
 
 
 DEFINE_LOG_CATEGORY(LogLabyPlayerController)
@@ -18,9 +16,14 @@ void ALabyPlayerController::PlayerTick(float DeltaTime) {
 	FVector MovementDirection(ForwardDirection + RightDirection);
 	MovementDirection.Normalize();
 
-	auto ControlledPawn = GetPawn();
-	if (IsValid(ControlledPawn)) {
-		ControlledPawn->AddMovementInput(MovementDirection, DeltaTime * FinalMovementSpeed);
+	if (auto* LabyPawn = Cast<ALabyPawn>(GetPawn())) {
+		LabyPawn->AddActorLocalOffset(MovementDirection * DeltaTime * FinalMovementSpeed);
+		LabyPawn->AddActorLocalRotation(FRotator{0.0f, YawInput * DeltaTime * LookSpeed, 0.0f});
+		if (auto* LabyPawnCamera = LabyPawn->GetCamera()) {
+			auto NewRotation = LabyPawnCamera->GetRelativeRotation();
+			NewRotation.Pitch = FMath::Clamp(NewRotation.Pitch + PitchInput * DeltaTime * LookSpeed, -89.0f, 89.0f);
+			LabyPawnCamera->SetRelativeRotation(NewRotation);
+		}
 	} else {
 		UE_LOG(LogLabyPlayerController, Warning, TEXT("ControlledPawn is invalid!"));
 	}
@@ -36,28 +39,28 @@ void ALabyPlayerController::SetupInputComponent() {
 	this->InputComponent->BindAxis("Acceleration", this, &ALabyPlayerController::Acceleration);
 }
 
-void ALabyPlayerController::MoveForward(float AxisValue) {
-	FVector Forward = GetControlRotation().Vector();
+void ALabyPlayerController::MoveForward(const float AxisValue) {
+	const auto Forward = GetControlRotation().Vector();
 	ForwardDirection = FVector(Forward.X, Forward.Y, 0.0f);
 	ForwardDirection.Normalize();
 	ForwardDirection *= AxisValue;
 }
 
-void ALabyPlayerController::MoveRight(float AxisValue) {
-	FVector Right = GetControlRotation().Quaternion().GetRightVector();
+void ALabyPlayerController::MoveRight(const float AxisValue) {
+	const auto Right = GetControlRotation().Quaternion().GetRightVector();
 	RightDirection = FVector(Right.X, Right.Y, 0.0f);
 	RightDirection.Normalize();
 	RightDirection *= AxisValue;
 }
 
-void ALabyPlayerController::LookRight(float AxisValue) {
-	AddYawInput(AxisValue * LookSpeed);
+void ALabyPlayerController::LookRight(const float AxisValue) {
+	YawInput = AxisValue;
 }
 
-void ALabyPlayerController::LookDown(float AxisValue) {
-	AddPitchInput(-AxisValue * LookSpeed);
+void ALabyPlayerController::LookDown(const float AxisValue) {
+	PitchInput = AxisValue;
 }
 
-void ALabyPlayerController::Acceleration(float AxisValue) {
+void ALabyPlayerController::Acceleration(const float AxisValue) {
 	FinalMovementSpeed = (1.0f + (AccelerationMultiplier - 1.0f) * AxisValue) * MovementSpeed;
 }
