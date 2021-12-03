@@ -2,8 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
-#include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "GameFramework/Pawn.h"
+
 #include "LabyPawn.generated.h"
 
 UCLASS()
@@ -28,9 +29,6 @@ protected:
 public:
 
 	UPROPERTY(EditAnywhere, Category = "Setup")
-	UStaticMesh* PawnMesh;
-
-	UPROPERTY(EditAnywhere, Category = "Setup")
 	UMaterialInterface* PPOutlineMaterial;
 
 protected:
@@ -39,6 +37,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UFloatingPawnMovement* Movement;
 
 private:
 

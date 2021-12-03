@@ -6,13 +6,11 @@ ALabyPawn::ALabyPawn() {
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	SetRootComponent(Mesh);
-	if (PawnMesh) {
-		Mesh->SetStaticMesh(PawnMesh);
-	}
-	Mesh->SetRelativeScale3D(FVector(0.5f));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(Mesh);
+
+	Movement = CreateDefaultSubobject<UFloatingPawnMovement>("Movement");
 }
 
 void ALabyPawn::BeginPlay() {

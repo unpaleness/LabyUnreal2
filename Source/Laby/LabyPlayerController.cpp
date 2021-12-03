@@ -13,12 +13,11 @@ ALabyPlayerController::ALabyPlayerController() {
 void ALabyPlayerController::PlayerTick(float DeltaTime) {
 	Super::PlayerTick(DeltaTime);
 
-	FVector MovementDirection(ForwardDirection + RightDirection);
-	MovementDirection.Normalize();
-
 	if (auto* LabyPawn = Cast<ALabyPawn>(GetPawn())) {
-		LabyPawn->AddActorLocalOffset(MovementDirection * DeltaTime * FinalMovementSpeed);
 		LabyPawn->AddActorLocalRotation(FRotator{0.0f, YawInput * DeltaTime * LookSpeed, 0.0f});
+		auto MovementDirection = LabyPawn->GetActorRotation().RotateVector(FVector{ForwardInput, RightInput, 0.0f});
+		MovementDirection.Normalize();
+		LabyPawn->AddMovementInput(MovementDirection, DeltaTime * FinalMovementSpeed);
 		if (auto* LabyPawnCamera = LabyPawn->GetCamera()) {
 			auto NewRotation = LabyPawnCamera->GetRelativeRotation();
 			NewRotation.Pitch = FMath::Clamp(NewRotation.Pitch + PitchInput * DeltaTime * LookSpeed, -89.0f, 89.0f);
@@ -40,17 +39,11 @@ void ALabyPlayerController::SetupInputComponent() {
 }
 
 void ALabyPlayerController::MoveForward(const float AxisValue) {
-	const auto Forward = GetControlRotation().Vector();
-	ForwardDirection = FVector(Forward.X, Forward.Y, 0.0f);
-	ForwardDirection.Normalize();
-	ForwardDirection *= AxisValue;
+	ForwardInput = AxisValue;
 }
 
 void ALabyPlayerController::MoveRight(const float AxisValue) {
-	const auto Right = GetControlRotation().Quaternion().GetRightVector();
-	RightDirection = FVector(Right.X, Right.Y, 0.0f);
-	RightDirection.Normalize();
-	RightDirection *= AxisValue;
+	RightInput = AxisValue;
 }
 
 void ALabyPlayerController::LookRight(const float AxisValue) {

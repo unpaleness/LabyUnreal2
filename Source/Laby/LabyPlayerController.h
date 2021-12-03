@@ -41,11 +41,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Player")
 	float FinalMovementSpeed = 0.0f;
 
-	/** Unit or null vector which indicates whether player is moving forward/backward or not */
-	FVector ForwardDirection = FVector(0.0f);
+	/** Input for moving forward/backward */
+	float ForwardInput = 0.0f;
 
-	/** Unit or null vector which indicates whether player is moving right/left or not */
-	FVector RightDirection = FVector(0.0f);
+	/** Input for moving right/left */
+	float RightInput = 0.0f;
 
 	/** Input for rotating horizontally */
 	float YawInput = 0.0f;
