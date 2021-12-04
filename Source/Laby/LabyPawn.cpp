@@ -13,15 +13,6 @@ ALabyPawn::ALabyPawn() {
 	Movement = CreateDefaultSubobject<UFloatingPawnMovement>("Movement");
 }
 
-void ALabyPawn::BeginPlay() {
-	Super::BeginPlay();
-
-	if (PPOutlineMaterial) {
-		PPOutlineMaterialDynamic = UMaterialInstanceDynamic::Create(PPOutlineMaterial, this);
-		Camera->AddOrUpdateBlendable(PPOutlineMaterialDynamic);
-	}
-}
-
 void ALabyPawn::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 }

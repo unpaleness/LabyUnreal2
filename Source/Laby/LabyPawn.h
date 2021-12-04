@@ -23,15 +23,6 @@ public:
 	FORCEINLINE UCameraComponent* GetCamera() const { return Camera; };
 
 protected:
-
-	virtual void BeginPlay() override;
-
-public:
-
-	UPROPERTY(EditAnywhere, Category = "Setup")
-	UMaterialInterface* PPOutlineMaterial;
-
-protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* Mesh;
 
@@ -40,9 +31,4 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UFloatingPawnMovement* Movement;
-
-private:
-
-	UPROPERTY()
-	UMaterialInstanceDynamic* PPOutlineMaterialDynamic;
 };

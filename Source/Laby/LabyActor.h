@@ -20,7 +20,6 @@ class LABY_API ALabyActor : public AActor {
 
 public:
 	ALabyActor();
-	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
@@ -37,24 +36,34 @@ private:
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	UProceduralMeshComponent* Mesh;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze")
+	UMaterialInterface* Material;
+
 	/** Number of cells in horizontal direction */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "1", ClampMax = "256", UIMin = "1", UIMax = "256"))
 	int32 HCells = 1;
+
 	/** Number of cells in vertical direction */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "1", ClampMax = "256", UIMin = "1", UIMax = "256"))
 	int32 VCells = 1;
+
 	/** Size of one cell */
 	UPROPERTY(BlueprintReadonly, EditAnywhere, Category = "Maze")
 	float CellSize = 100.0f;
+
 	/** Width of labyrinth wall in relative units comparing with cell's size*/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "0"))
 	float WallWidthRelative = 0.05f;
+
 	/** Wall height */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "0"))
 	float Height = 50.0f;
+
 	/** Maze generator algorithm */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze")
 	EGeneratorType Algorithm = EGeneratorType::OnlyWalls;
+
 	/** Interation limit for generator */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Maze", meta = (ClampMin = "0"))
 	int32 MaxIterations = 100000;

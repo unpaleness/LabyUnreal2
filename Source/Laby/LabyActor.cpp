@@ -14,10 +14,6 @@ ALabyActor::ALabyActor() {
 	SetRootComponent(Mesh);
 }
 
-void ALabyActor::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-}
-
 void ALabyActor::OnConstruction(const FTransform& Transform) {
 	if (HasChanges()) {
 		GenerateMesh();
@@ -38,6 +34,11 @@ void ALabyActor::GenerateMesh() {
 
 	Mesh->ClearMeshSection(0);
 	Mesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
+	if (Material) {
+		Mesh->SetMaterial(0, Material);
+	} else {
+		UE_LOG(LogLabyActor, Warning, TEXT("%S: Invalid Material, will use default"), __FUNCTION__)
+	}
 }
 
 bool ALabyActor::HasChanges() {
@@ -142,10 +143,10 @@ void ALabyActor::AddPlane(FVector P1, FVector P2, FVector P3, FVector P4) {
 	Triangles.Add(V + 2);
 	Triangles.Add(V + 3);
 
-	UVs.Add(FVector2D(0.0f, 1.0f));
 	UVs.Add(FVector2D(0.0f, 0.0f));
-	UVs.Add(FVector2D(1.0f, 1.0f));
+	UVs.Add(FVector2D(0.0f, 1.0f));
 	UVs.Add(FVector2D(1.0f, 0.0f));
+	UVs.Add(FVector2D(1.0f, 1.0f));
 
 	auto Normal = FVector::CrossProduct(P2 - P1, P3 - P1);
 	Normal.Normalize();
@@ -192,6 +193,7 @@ void ALabyActor::GenerateMaze() {
 		Maze = Generator->GenerateMaze(X, Y);
 		IsMazeNeedGenerate = false;
 	} else {
-		UE_LOG(LogLabyActor, Error, TEXT("Invalid Generator::Type value: %i, cannot create maze generator"), static_cast<int32>(Alg))
+		UE_LOG(LogLabyActor, Error, TEXT("%S: Invalid Generator::Type value: %i, cannot create maze generator"),
+		       __FUNCTION__, static_cast<int32>(Alg))
 	}
 }
