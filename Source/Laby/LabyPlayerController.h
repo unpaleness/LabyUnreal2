@@ -27,7 +27,7 @@ protected:
 protected:
 	/** Movement speed without acceleration */
 	UPROPERTY(EditAnywhere, Category = "Player")
-	float MovementSpeed = 30.0f;
+	float ForcePerSecBase = 10000.0f;
 
 	/** Lookaround speed */
 	UPROPERTY(EditAnywhere, Category = "Player")
@@ -38,8 +38,7 @@ protected:
 	float AccelerationMultiplier = 2.0f;
 
 	/** Total movement speed including potential acceletation */
-	UPROPERTY(EditAnywhere, Category = "Player")
-	float FinalMovementSpeed = 0.0f;
+	float ForcePerSecFinal = 0.0f;
 
 	/** Input for moving forward/backward */
 	float ForwardInput = 0.0f;

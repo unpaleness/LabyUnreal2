@@ -17,14 +17,14 @@ void ALabyPlayerController::PlayerTick(float DeltaTime) {
 		LabyPawn->AddActorLocalRotation(FRotator{0.0f, YawInput * DeltaTime * LookSpeed, 0.0f});
 		auto MovementDirection = LabyPawn->GetActorRotation().RotateVector(FVector{ForwardInput, RightInput, 0.0f});
 		MovementDirection.Normalize();
-		LabyPawn->AddMovementInput(MovementDirection, DeltaTime * FinalMovementSpeed);
+		LabyPawn->GetMesh()->AddForce(MovementDirection * DeltaTime * ForcePerSecFinal * LabyPawn->GetMass(), NAME_None);
 		if (auto* LabyPawnCamera = LabyPawn->GetCamera()) {
 			auto NewRotation = LabyPawnCamera->GetRelativeRotation();
 			NewRotation.Pitch = FMath::Clamp(NewRotation.Pitch + PitchInput * DeltaTime * LookSpeed, -89.0f, 89.0f);
 			LabyPawnCamera->SetRelativeRotation(NewRotation);
 		}
 	} else {
-		UE_LOG(LogLabyPlayerController, Warning, TEXT("ControlledPawn is invalid!"));
+		UE_LOG(LogLabyPlayerController, Warning, TEXT("%S: ControlledPawn is invalid!"), __FUNCTION__);
 	}
 }
 
@@ -55,5 +55,5 @@ void ALabyPlayerController::LookDown(const float AxisValue) {
 }
 
 void ALabyPlayerController::Acceleration(const float AxisValue) {
-	FinalMovementSpeed = (1.0f + (AccelerationMultiplier - 1.0f) * AxisValue) * MovementSpeed;
+	ForcePerSecFinal = (1.0f + (AccelerationMultiplier - 1.0f) * AxisValue) * ForcePerSecBase;
 }
