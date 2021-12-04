@@ -37,13 +37,7 @@ void ALabyActor::GenerateMesh() {
 	InitArrays();
 
 	Mesh->ClearMeshSection(0);
-	Mesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), UVs, TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
-}
-
-void ALabyActor::AddTriangle(int32 V1, int32 V2, int32 V3) {
-	Triangles.Add(V1);
-	Triangles.Add(V2);
-	Triangles.Add(V3);
+	Mesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
 }
 
 bool ALabyActor::HasChanges() {
@@ -64,8 +58,9 @@ bool ALabyActor::HasChanges() {
 void ALabyActor::InitArrays() {
 	Vertices.Empty();
 	Triangles.Empty();
+	Normals.Empty();
 	UVs.Empty();
-	
+
 	if (IsMazeNeedGenerate) {
 		GenerateMaze();
 	}
@@ -73,18 +68,10 @@ void ALabyActor::InitArrays() {
 	H = Height;
 
 	// Add floor
-	AddPlane(
-		FVector(
-			-S * (W * (X + 1) + X) / 2.0f,
-			-S * (W * (Y + 1) + Y) / 2.0f,
-			0.0f
-		),
-		FVector(
-			S * (W * (X + 1) + X) / 2.0f,
-			S * (W * (Y + 1) + Y) / 2.0f,
-			0.0f
-		)
-	);
+	const auto RadiusX = S * (W * (X + 1) + X) / 2.0f;
+	const auto RadiusY = S * (W * (Y + 1) + Y) / 2.0f;
+	AddPlane(FVector{-RadiusX, -RadiusY, 0.0f}, FVector{RadiusX, -RadiusY, 0.0f},
+	         FVector{-RadiusX, RadiusY, 0.0f}, FVector{RadiusX, RadiusY, 0.0f});
 
 	for (int32 j = 0; j < Y + 1; ++j) {
 		for (int32 i = 0; i < X + 1; ++i) {
@@ -139,87 +126,58 @@ void ALabyActor::InitArrays() {
 	}
 }
 
-void ALabyActor::AddPlane(FVector P1, FVector P2) {
+void ALabyActor::AddPlane(FVector P1, FVector P2, FVector P3, FVector P4) {
 	int32 V{ Vertices.Num() };
 
-	FVector V0(P1);
-	FVector V1(P2.X, P1.Y, (P1.Z + P2.Z) / 2.0f);
-	FVector V2(P1.X, P2.Y, (P1.Z + P2.Z) / 2.0f);
-	FVector V3(P2);
+	Vertices.Add(P1);
+	Vertices.Add(P2);
+	Vertices.Add(P3);
+	Vertices.Add(P4);
 
-	Vertices.Add(V0);
-	Vertices.Add(V1);
-	Vertices.Add(V2);
-	Vertices.Add(V3);
+	Triangles.Add(V + 0);
+	Triangles.Add(V + 3);
+	Triangles.Add(V + 1);
 
-	AddTriangle(V + 0, V + 3, V + 1);
-	AddTriangle(V + 0, V + 2, V + 3);
+	Triangles.Add(V + 0);
+	Triangles.Add(V + 2);
+	Triangles.Add(V + 3);
 
 	UVs.Add(FVector2D(0.0f, 1.0f));
 	UVs.Add(FVector2D(0.0f, 0.0f));
 	UVs.Add(FVector2D(1.0f, 1.0f));
 	UVs.Add(FVector2D(1.0f, 0.0f));
+
+	auto Normal = FVector::CrossProduct(P2 - P1, P3 - P1);
+	Normal.Normalize();
+	Normals.Append({Normal, Normal, Normal, Normal});
 }
 
 void ALabyActor::AddCuboid(FVector P1, FVector P2, EMazeCubiodFaces Direction) {
-	int32 V{ Vertices.Num() };
-
-	FVector V0(P1);
-	FVector V1(P1.X, P1.Y, P2.Z);
-	FVector V2(P1.X, P2.Y, P1.Z);
-	FVector V3(P1.X, P2.Y, P2.Z);
-	FVector V4(P2.X, P1.Y, P1.Z);
-	FVector V5(P2.X, P1.Y, P2.Z);
-	FVector V6(P2.X, P2.Y, P1.Z);
-	FVector V7(P2);
-
-	auto AddHorizontalVertices = [=]() {
-		Vertices.Add(V0);
-		Vertices.Add(V1);
-		Vertices.Add(V2);
-		Vertices.Add(V3);
-		Vertices.Add(V6);
-		Vertices.Add(V7);
-		Vertices.Add(V4);
-		Vertices.Add(V5);
+	auto AddHorizontalPlanes = [this, P1, P2]() {
+		AddPlane(FVector{P1.X, P2.Y, P1.Z}, FVector{P1.X, P1.Y, P1.Z}, FVector{P1.X, P2.Y, P2.Z}, FVector{P1.X, P1.Y, P2.Z});
+		AddPlane(FVector{P2.X, P2.Y, P1.Z}, FVector{P2.X, P2.Y, P2.Z}, FVector{P2.X, P1.Y, P1.Z}, FVector{P2.X, P1.Y, P2.Z});
 	};
 
-	auto AddVerticalVertices = [=]() {
-		Vertices.Add(V2);
-		Vertices.Add(V3);
-		Vertices.Add(V6);
-		Vertices.Add(V7);
-		Vertices.Add(V4);
-		Vertices.Add(V5);
-		Vertices.Add(V0);
-		Vertices.Add(V1);
+	auto AddVerticalPlanes = [this, P1, P2]() {
+		AddPlane(FVector{P1.X, P1.Y, P1.Z}, FVector{P2.X, P1.Y, P1.Z}, FVector{P1.X, P1.Y, P2.Z}, FVector{P2.X, P1.Y, P2.Z});
+		AddPlane(FVector{P1.X, P2.Y, P1.Z}, FVector{P1.X, P2.Y, P2.Z}, FVector{P2.X, P2.Y, P1.Z}, FVector{P2.X, P2.Y, P2.Z});
 	};
 
 	switch (Direction) {
 	case EMazeCubiodFaces::Horizontal:
-		AddHorizontalVertices();
+		AddHorizontalPlanes();
 		break;
 	case EMazeCubiodFaces::Vertical:
-		AddVerticalVertices();
+		AddVerticalPlanes();
 		break;
 	default:
-		AddHorizontalVertices();
-		AddVerticalVertices();
+		AddHorizontalPlanes();
+		AddVerticalPlanes();
 		break;
 	}
-	Vertices.Add(V3);
-	Vertices.Add(V1);
-	Vertices.Add(V7);
-	Vertices.Add(V5);
 
-	for (int32 i = 0; i < (Vertices.Num() - V) / 4; ++i) {
-		AddTriangle(V + i * 4, V + i * 4 + 3, V + i * 4 + 1);
-		AddTriangle(V + i * 4, V + i * 4 + 2, V + i * 4 + 3);
-		UVs.Add(FVector2D(0.0f, 1.0f));
-		UVs.Add(FVector2D(0.0f, 0.0f));
-		UVs.Add(FVector2D(1.0f, 1.0f));
-		UVs.Add(FVector2D(1.0f, 0.0f));
-	}
+	// Top Plane
+	AddPlane(FVector{P1.X, P1.Y, P2.Z}, FVector{P2.X, P1.Y, P2.Z}, FVector{P1.X, P2.Y, P2.Z}, FVector{P2.X, P2.Y, P2.Z});
 }
 
 void ALabyActor::GenerateMaze() {

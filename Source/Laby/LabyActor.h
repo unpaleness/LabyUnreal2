@@ -30,8 +30,7 @@ private:
 	void GenerateMesh();
 	bool HasChanges();
 	void InitArrays();
-	void AddTriangle(int32 V1, int32 V2, int32 V3);
-	void AddPlane(FVector P1, FVector P2);
+	void AddPlane(FVector P1, FVector P2, FVector P3, FVector P4);
 	void AddCuboid(FVector P1, FVector P2, EMazeCubiodFaces Direction);
 	void GenerateMaze();
 
@@ -63,6 +62,7 @@ protected:
 private:
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
+	TArray<FVector> Normals;
 	TArray<FVector2D> UVs;
 	/** Inner cell size */
 	float S = 0.0f;
