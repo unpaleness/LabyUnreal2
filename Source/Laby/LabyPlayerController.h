@@ -14,6 +14,8 @@ class LABY_API ALabyPlayerController : public APlayerController {
 public:
 	ALabyPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
+	virtual bool InputTouch(uint32 Handle, ETouchType::Type Type, const FVector2D& TouchLocation, float Force,
+	                        FDateTime DeviceTimestamp, uint32 TouchpadIndex) override;
 
 protected:
 	virtual void SetupInputComponent() override;
@@ -24,12 +26,8 @@ protected:
 	void LookDown(float AxisValue);
 	void Acceleration(float AxisValue);
 
-	void OnTouchBegin(ETouchIndex::Type TouchIndex, FVector Location);
-	void OnTouchEnd(ETouchIndex::Type TouchIndex, FVector Location);
-	void OnTouchMove(ETouchIndex::Type TouchIndex, FVector Location);
-
 private:
-	void ResetAllInput();
+	void ResetInputs();
 
 protected:
 	/** Movement speed without acceleration */
@@ -60,6 +58,6 @@ private:
 	/** Input for camera rotating up/down */
 	float PitchInput = 0.0f;
 
-	/** The normalized screen location when a drag starts */
-	FVector2D LastTouchLocation = FVector2D::ZeroVector;
+	/** Location of the touch event */
+	FVector2D TouchLocation = FVector2D::ZeroVector;
 };

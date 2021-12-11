@@ -13,6 +13,8 @@ ALabyPlayerController::ALabyPlayerController() {
 void ALabyPlayerController::PlayerTick(float DeltaTime) {
 	Super::PlayerTick(DeltaTime);
 
+	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S"), __FUNCTION__)
+
 	if (const auto* LabyPawn = Cast<ALabyPawn>(GetPawn())) {
 		FRotator MovementRotator = FRotator::ZeroRotator;
 		if (auto* LabyPawnCamera = LabyPawn->GetCamera()) {
@@ -25,11 +27,46 @@ void ALabyPlayerController::PlayerTick(float DeltaTime) {
 		MovementDirection.Normalize();
 		LabyPawn->GetMesh()->AddForce(MovementDirection * DeltaTime * ForcePerSecFinal * LabyPawn->GetMass(), NAME_None);
 	} else {
-		UE_LOG(LogLabyPlayerController, Warning, TEXT("%S: ControlledPawn is invalid!"), __FUNCTION__);
+		UE_LOG(LogLabyPlayerController, Warning, TEXT("%S: ControlledPawn is invalid!"), __FUNCTION__)
 	}
 
-	ResetAllInput();
+	ResetInputs();
 }
+
+bool ALabyPlayerController::InputTouch(uint32 Handle, ETouchType::Type Type, const FVector2D& TouchLocation,
+                                       float Force, FDateTime DeviceTimestamp, uint32 TouchpadIndex) {
+	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: Handle: %lu, Type: %s, TouchLocation: %s, TouchpadIndex: %lu"),
+	       __FUNCTION__, Handle, *UEnum::GetValueAsString(Type), *TouchLocation.ToString(), TouchpadIndex)
+
+	const auto bParentResult = Super::InputTouch(Handle, Type, TouchLocation, Force, DeviceTimestamp, TouchpadIndex);
+	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: Super::InputTouch: %s"), __FUNCTION__,
+	       bParentResult ? TEXT("True") : TEXT("False"))
+
+	if (!bParentResult) {
+		return false;
+	}
+
+	switch (Type) {
+	case ETouchType::Began:
+		this->TouchLocation = TouchLocation;
+		return true;
+	case ETouchType::Ended:
+		this->TouchLocation = FVector2D::ZeroVector;
+		return true;
+	case ETouchType::Moved:
+		if (this->TouchLocation != FVector2D::ZeroVector) {
+			static constexpr float TouchInputMultiplier = 0.1f;
+			const auto InputAxis = (TouchLocation - this->TouchLocation) * TouchInputMultiplier;
+			LookRight(InputAxis.X);
+			LookDown(-InputAxis.Y);
+			this->TouchLocation = TouchLocation;
+		}
+		return true;
+	default:
+		return false;
+	}
+}
+
 
 void ALabyPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
@@ -39,64 +76,36 @@ void ALabyPlayerController::SetupInputComponent() {
 	InputComponent->BindAxis("LookRight", this, &ALabyPlayerController::LookRight);
 	InputComponent->BindAxis("LookDown", this, &ALabyPlayerController::LookDown);
 	InputComponent->BindAxis("Acceleration", this, &ALabyPlayerController::Acceleration);
-
-	InputComponent->BindTouch(IE_Pressed, this, &ALabyPlayerController::OnTouchBegin);
-	InputComponent->BindTouch(IE_Released, this, &ALabyPlayerController::OnTouchEnd);
-	InputComponent->BindTouch(IE_Repeat, this, &ALabyPlayerController::OnTouchMove);
 }
 
 void ALabyPlayerController::MoveForward(const float AxisValue) {
-	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: AxisValue: %f"), __FUNCTION__, AxisValue);
-	ForwardInput = AxisValue;
+	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: AxisValue: %f"), __FUNCTION__, AxisValue)
+	ForwardInput += AxisValue;
 }
 
 void ALabyPlayerController::MoveRight(const float AxisValue) {
-	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: AxisValue: %f"), __FUNCTION__, AxisValue);
-	RightInput = AxisValue;
+	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: AxisValue: %f"), __FUNCTION__, AxisValue)
+	RightInput += AxisValue;
 }
 
 void ALabyPlayerController::LookRight(const float AxisValue) {
-	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: AxisValue: %f"), __FUNCTION__, AxisValue);
-	YawInput = AxisValue;
+	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: AxisValue: %f"), __FUNCTION__, AxisValue)
+	YawInput += AxisValue;
 }
 
 void ALabyPlayerController::LookDown(const float AxisValue) {
-	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: AxisValue: %f"), __FUNCTION__, AxisValue);
-	PitchInput = AxisValue;
+	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: AxisValue: %f"), __FUNCTION__, AxisValue)
+	PitchInput += AxisValue;
 }
 
 void ALabyPlayerController::Acceleration(const float AxisValue) {
 	ForcePerSecFinal = (1.0f + (AccelerationMultiplier - 1.0f) * AxisValue) * ForcePerSecBase;
 }
 
-void ALabyPlayerController::OnTouchBegin(ETouchIndex::Type TouchIndex, FVector Location) {
-	if (TouchIndex == ETouchIndex::Touch1) {
-		LastTouchLocation = FVector2D(Location);
-	}
-}
-
-void ALabyPlayerController::OnTouchEnd(ETouchIndex::Type TouchIndex, FVector Location) {
-	if (TouchIndex == ETouchIndex::Touch1) {
-		LastTouchLocation = FVector2D::ZeroVector;
-	}
-}
-
-void ALabyPlayerController::OnTouchMove(ETouchIndex::Type TouchIndex, FVector Location) {
-	if (TouchIndex == ETouchIndex::Touch1 && !LastTouchLocation.IsZero()) {
-		static constexpr float TouchRotationScale = 0.1f;
-		const auto DragDelta = (FVector2D(Location) - LastTouchLocation) * TouchRotationScale;
-
-		LookRight(DragDelta.X);
-		LookDown(-DragDelta.Y);
-
-		LastTouchLocation = FVector2D(Location);
-	}
-}
-
-void ALabyPlayerController::ResetAllInput() {
-	ForcePerSecFinal = 0.f;
-	ForwardInput = 0.f;
-	RightInput = 0.f;
-	YawInput = 0.f;
-	PitchInput = 0.f;
+void ALabyPlayerController::ResetInputs() {
+	ForcePerSecFinal = 0.0f;
+	ForwardInput = 0.0f;
+	RightInput = 0.0f;
+	YawInput = 0.0f;
+	PitchInput = 0.0f;
 }
