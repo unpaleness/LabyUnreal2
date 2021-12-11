@@ -15,6 +15,8 @@ void ALabyPlayerController::PlayerTick(float DeltaTime) {
 
 	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S"), __FUNCTION__)
 
+	ProcessMotionState();
+
 	if (const auto* LabyPawn = Cast<ALabyPawn>(GetPawn())) {
 		FRotator MovementRotator = FRotator::ZeroRotator;
 		if (auto* LabyPawnCamera = LabyPawn->GetCamera()) {
@@ -67,7 +69,6 @@ bool ALabyPlayerController::InputTouch(uint32 Handle, ETouchType::Type Type, con
 	}
 }
 
-
 void ALabyPlayerController::SetupInputComponent() {
 	Super::SetupInputComponent();
 
@@ -100,6 +101,17 @@ void ALabyPlayerController::LookDown(const float AxisValue) {
 
 void ALabyPlayerController::Acceleration(const float AxisValue) {
 	ForcePerSecFinal = (1.0f + (AccelerationMultiplier - 1.0f) * AxisValue) * ForcePerSecBase;
+}
+
+void ALabyPlayerController::ProcessMotionState() {
+	FVector Tilt, RotationRate, Gravity, Acceleration;
+	GetInputMotionState(Tilt, RotationRate, Gravity, Acceleration);
+
+	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: Tilt: %s"), __FUNCTION__, *Tilt.ToString())
+
+	static constexpr float TouchMotionMultiplier = 1.f;
+	MoveForward(Tilt.X * TouchMotionMultiplier);
+	MoveRight(Tilt.Y * TouchMotionMultiplier);
 }
 
 void ALabyPlayerController::ResetInputs() {

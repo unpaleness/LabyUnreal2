@@ -27,6 +27,7 @@ protected:
 	void Acceleration(float AxisValue);
 
 private:
+	void ProcessMotionState();
 	void ResetInputs();
 
 protected:
