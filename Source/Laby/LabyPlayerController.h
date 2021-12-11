@@ -24,6 +24,13 @@ protected:
 	void LookDown(float AxisValue);
 	void Acceleration(float AxisValue);
 
+	void OnTouchBegin(ETouchIndex::Type TouchIndex, FVector Location);
+	void OnTouchEnd(ETouchIndex::Type TouchIndex, FVector Location);
+	void OnTouchMove(ETouchIndex::Type TouchIndex, FVector Location);
+
+private:
+	void ResetAllInput();
+
 protected:
 	/** Movement speed without acceleration */
 	UPROPERTY(EditAnywhere, Category = "Player")
@@ -37,6 +44,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Player")
 	float AccelerationMultiplier = 2.0f;
 
+private:
 	/** Total movement speed including potential acceletation */
 	float ForcePerSecFinal = 0.0f;
 
@@ -51,4 +59,7 @@ protected:
 
 	/** Input for camera rotating up/down */
 	float PitchInput = 0.0f;
+
+	/** The normalized screen location when a drag starts */
+	FVector2D LastTouchLocation = FVector2D::ZeroVector;
 };
