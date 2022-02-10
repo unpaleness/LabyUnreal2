@@ -33,7 +33,7 @@ private:
 protected:
 	/** Movement speed without acceleration */
 	UPROPERTY(EditAnywhere, Category = "Player")
-	float ForcePerSecBase = 10000.0f;
+	float ForcePerSecBase = 10000.f;
 
 	/** Lookaround speed */
 	UPROPERTY(EditAnywhere, Category = "Player")
@@ -41,23 +41,23 @@ protected:
 
 	/** Relative speed when acceleration button is pressed */
 	UPROPERTY(EditAnywhere, Category = "Player")
-	float AccelerationMultiplier = 2.0f;
+	float AccelerationMultiplier = 2.f;
 
 private:
 	/** Total movement speed including potential acceletation */
-	float ForcePerSecFinal = 0.0f;
+	float ForcePerSecFinal = 0.f;
 
 	/** Input for moving forward/backward */
-	float ForwardInput = 0.0f;
+	float ForwardInput = 0.f;
 
 	/** Input for moving right/left */
-	float RightInput = 0.0f;
+	float RightInput = 0.f;
 
 	/** Input for rotating horizontally */
-	float YawInput = 0.0f;
+	float YawInput = 0.f;
 
 	/** Input for camera rotating up/down */
-	float PitchInput = 0.0f;
+	float PitchInput = 0.f;
 
 	/** Location of the touch event */
 	FVector2D TouchLocation = FVector2D::ZeroVector;

@@ -21,12 +21,14 @@ void ALabyPlayerController::PlayerTick(float DeltaTime) {
 		FRotator MovementRotator = FRotator::ZeroRotator;
 		if (auto* LabyPawnCamera = LabyPawn->GetCamera()) {
 			MovementRotator = LabyPawnCamera->GetRelativeRotation();
-			MovementRotator.Pitch = FMath::Clamp(MovementRotator.Pitch + PitchInput * DeltaTime * LookSpeed, -89.0f, 89.0f);
+			MovementRotator.Pitch = FMath::Clamp(MovementRotator.Pitch + PitchInput * DeltaTime * LookSpeed, -89.f, 89.f);
 			MovementRotator.Yaw += YawInput * DeltaTime * LookSpeed;
 			LabyPawnCamera->SetRelativeRotation(MovementRotator);
 		}
-		auto MovementDirection = MovementRotator.RotateVector({ForwardInput, RightInput, 0.0f});
+		auto MovementDirection = MovementRotator.RotateVector({ForwardInput, RightInput, 0.f});
+		MovementDirection.Z = 0.f;
 		MovementDirection.Normalize();
+
 		LabyPawn->GetMesh()->AddForce(MovementDirection * DeltaTime * ForcePerSecFinal * LabyPawn->GetMass(), NAME_None);
 	} else {
 		UE_LOG(LogLabyPlayerController, Warning, TEXT("%S: ControlledPawn is invalid!"), __FUNCTION__)
@@ -100,7 +102,7 @@ void ALabyPlayerController::LookDown(const float AxisValue) {
 }
 
 void ALabyPlayerController::Acceleration(const float AxisValue) {
-	ForcePerSecFinal = (1.0f + (AccelerationMultiplier - 1.0f) * AxisValue) * ForcePerSecBase;
+	ForcePerSecFinal = (1.f + (AccelerationMultiplier - 1.f) * AxisValue) * ForcePerSecBase;
 }
 
 void ALabyPlayerController::ProcessMotionState() {
@@ -109,15 +111,15 @@ void ALabyPlayerController::ProcessMotionState() {
 
 	UE_LOG(LogLabyPlayerController, Verbose, TEXT("%S: Tilt: %s"), __FUNCTION__, *Tilt.ToString())
 
-	static constexpr float TouchMotionMultiplier = 1.f;
-	MoveForward(Tilt.X * TouchMotionMultiplier);
-	MoveRight(Tilt.Y * TouchMotionMultiplier);
+	static constexpr float TouchMotionMultiplier = 0.1f;
+	MoveForward(Tilt.Y * TouchMotionMultiplier);
+	MoveRight(- Tilt.X * TouchMotionMultiplier);
 }
 
 void ALabyPlayerController::ResetInputs() {
-	ForcePerSecFinal = 0.0f;
-	ForwardInput = 0.0f;
-	RightInput = 0.0f;
-	YawInput = 0.0f;
-	PitchInput = 0.0f;
+	ForcePerSecFinal = 0.f;
+	ForwardInput = 0.f;
+	RightInput = 0.f;
+	YawInput = 0.f;
+	PitchInput = 0.f;
 }
